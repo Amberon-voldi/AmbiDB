@@ -101,10 +101,5 @@ The CLI validates arguments and reports SQL errors returned by SQLite. Foreign k
 - [sql/schema.sql](sql/schema.sql) — DDL with normalization and constraints
 - [sql/seed.sql](sql/seed.sql) — sample data for demo and viva
 
-## Notes for Viva
 
-1. Explain 3NF and how each table removes redundancy.
-2. Point out foreign keys and how they enforce referential integrity.
-3. Demonstrate join queries and CRUD flow.
-4. Show dynamic table creation via CLI.
 
