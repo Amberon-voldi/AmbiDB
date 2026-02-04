@@ -1,105 +1,78 @@
 # AmbiDB (C++)
 
-AmbiDB is a minimal relational DBMS demonstration built in C++ on top of SQLite. It covers undergraduate DBMS concepts: normalization, schema design, SQL-based CRUD, foreign keys, and joins. The CLI focuses on structured records for a university domain.
+AmbiDB is a console-based DBMS project in C++ that demonstrates core DBMS concepts: data storage, retrieval, CRUD operations, and basic integrity checks. Records are persisted to a file to mimic a simple database.
 
 ## Features
 
-- 3NF schema with proper primary and foreign keys
-- SQL-based CRUD operations (students + enrollments)
-- Dynamic table creation via CLI
-- Sample data and join queries
-- Error handling and input validation
+- Menu-driven console interface
+- `Record` structure representing a table row
+- CRUD operations: Insert, Display, Search, Update, Delete
+- File-based persistence (simple text table)
+- Input validation and error handling
+- Modular functions for each operation
 
-## Schema Overview (3NF)
+## Data Model (Single Table)
 
-Entities are separated to eliminate redundancy:
+Each record represents a student-like entity:
 
-- `departments` (master list)
-- `students` (references `departments`)
-- `instructors` (references `departments`)
-- `courses` (references `departments` and `instructors`)
-- `enrollments` (junction table for `students` and `courses`)
+- `id` (primary key)
+- `name`
+- `age`
+- `department`
+- `email` (unique within the file)
 
-All non-key attributes depend on the key, the whole key, and nothing but the key, satisfying 3NF.
-
-See [sql/schema.sql](sql/schema.sql) for full DDL.
+This is enough to demonstrate DBMS fundamentals in a compact, viva-friendly format.
 
 ## Build (macOS)
 
-1. Install SQLite dev headers if needed (Homebrew): `brew install sqlite`
-2. Compile:
-	 `clang++ -std=c++17 -O2 -I/opt/homebrew/include src/main.cpp -L/opt/homebrew/lib -lsqlite3 -o ambidb`
-
-If SQLite is already in the system include paths, you can omit `-I` and `-L`.
+```
+clang++ -std=c++17 -O2 src/main.cpp -o ambidb
+```
 
 ## Steps to Access (Run the CLI)
 
-1. Initialize database and tables:
-	 `./ambidb init ambidb.db`
-2. Load sample data:
-	 `./ambidb seed ambidb.db`
-3. Run CRUD commands or ad-hoc SQL queries.
+1. Build the project (command above).
+2. Run: `./ambidb`
+3. Use the menu to insert/search/update/delete records.
+4. Data is saved to `ambidb_records.txt` on exit.
 
-## CLI Commands
-
-```
-ambidb init [db_path]
-ambidb seed [db_path]
-ambidb create-table [db_path] <sql>
-ambidb add-student [db_path] <name> <email> <dept_id>
-ambidb update-student-email [db_path] <student_id> <email>
-ambidb delete-student [db_path] <student_id>
-ambidb list-students [db_path]
-ambidb enroll [db_path] <student_id> <course_id> <semester> <grade>
-ambidb list-enrollments [db_path]
-ambidb query [db_path] <sql>
-```
-
-## Example Usage
-
-### CRUD
-
-- Create a student:
-	`./ambidb add-student ambidb.db "Neel Das" neel@ambidb.edu 1`
-
-- Read (list students with department):
-	`./ambidb list-students ambidb.db`
-
-- Update:
-	`./ambidb update-student-email ambidb.db 1 newmail@ambidb.edu`
-
-- Delete:
-	`./ambidb delete-student ambidb.db 4`
-
-### Dynamic Table Creation
+## Menu Options
 
 ```
-./ambidb create-table ambidb.db "CREATE TABLE IF NOT EXISTS clubs (club_id INTEGER PRIMARY KEY, name TEXT UNIQUE);"
+1. Insert record
+2. Display all records
+3. Search record
+4. Update record
+5. Delete record
+6. Save and Exit
 ```
 
-### Join Queries (Relationships)
+## File Storage Format
 
-List students with the courses they took:
-
-```
-./ambidb query ambidb.db "SELECT s.name, c.code, c.title, e.semester, e.grade FROM enrollments e JOIN students s ON e.student_id = s.student_id JOIN courses c ON e.course_id = c.course_id ORDER BY s.name;"
-```
-
-List departments and their courses:
+Records are stored in a text file where each line is a record:
 
 ```
-./ambidb query ambidb.db "SELECT d.name AS department, c.code, c.title FROM courses c JOIN departments d ON c.dept_id = d.dept_id ORDER BY d.name, c.code;"
+id|name|age|department|email
 ```
+
+The program escapes `|` and `\\` to keep parsing reliable.
 
 ## Error Handling
 
-The CLI validates arguments and reports SQL errors returned by SQLite. Foreign key constraints are enforced via `PRAGMA foreign_keys = ON;`.
+- Input validation for numeric fields
+- Email uniqueness check
+- Graceful handling of corrupted file rows
 
 ## Files
 
-- [src/main.cpp](src/main.cpp) — CLI implementation and SQL CRUD logic
-- [sql/schema.sql](sql/schema.sql) — DDL with normalization and constraints
-- [sql/seed.sql](sql/seed.sql) — sample data for demo and viva
+- [src/main.cpp](src/main.cpp) — main menu, CRUD, file I/O
+
+## Notes for Viva
+
+1. Explain how file storage simulates a table.
+2. Show CRUD flow and where input validation happens.
+3. Discuss primary key (`id`) and uniqueness (`email`).
+4. Demonstrate persistence across program runs.
 
 
 
